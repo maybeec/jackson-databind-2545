@@ -68,27 +68,8 @@ public class JMSConfig {
   @Bean
   public IntegrationFlow serviceActivatorJmsEmailConsumer(QueueConnectionFactory jmsConnectionFactory) {
 
-    RetryOperationsInterceptor retryOperationsInterceptor = new RetryOperationsInterceptor();
-    retryOperationsInterceptor.setRetryOperations(emailRetryTemplate());
-
     return IntegrationFlows.from(Jms.inboundGateway(jmsListenerContainer(jmsConnectionFactory)).autoStartup(true)
         .jmsMessageConverter(jacksonJmsMessageConverter()).id("emailInboundGateway").get()).get();
-  }
-
-  @Bean
-  public RetryTemplate emailRetryTemplate() {
-
-    RetryTemplate retryTemplate = new RetryTemplate();
-
-    FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
-    fixedBackOffPolicy.setBackOffPeriod(2000l);
-    retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
-
-    SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-    retryPolicy.setMaxAttempts(2);
-    retryTemplate.setRetryPolicy(retryPolicy);
-
-    return retryTemplate;
   }
 
   @Bean
